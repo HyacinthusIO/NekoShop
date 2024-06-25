@@ -9,7 +9,7 @@ Copyright 2024 HyacinthusIO
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import unittest
 import aiogram
