@@ -9,7 +9,7 @@ Copyright 2024 HyacinthusIO
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import unittest
 import aiogram
@@ -19,7 +19,7 @@ import os
 import aiogram.exceptions
 
 from prototypes.telegram_scripts.bot_handler import *
-import prototypes.external_scripts.env_handler as env_handler
+from .auxiliary_modules.get_bot_token import get_bot_token
 
 from aiogram.client.default import DefaultBotProperties
 from aiogram.utils.token import TokenValidationError
@@ -28,35 +28,6 @@ from aiogram.utils.token import TokenValidationError
 PATH_TO_TEST_DIR: str = os.path.dirname(__file__)
 TEST_DATA_DIR_NAME: str = "test_data"
 ENV_FILE_NAME_WITH_CORRECT_BOT_TOKEN: str = "correct_bot_token.env"
-
-
-# ----------------------------------------------------------------------------
-def get_bot_token(filepath: str, token_key: str) -> str:
-    """get_bot_token возвращает полученный токен из виртуального окружения.
-
-    Функция предназначенна для загрузки `.env` файла в текущее виртуальное окружение,
-    в целях получить токен для telegram бота.
-
-    Args:
-        filepath (str): путь к файлу, хранящему токен.
-        token_key (str): название ключа в файле и виртуальном окружении.
-
-    Raises:
-        EnvironmentError: Возбуждается если загрузка ключей не удалась.
-
-    Returns:
-        str: токен telegram бота полученный из виртуального окружения.
-    """
-    if env_handler.load_env_file(filepath=filepath):
-        correct_bot_token: str = env_handler.get_key_value_from_environment(
-            key=token_key
-        )
-    else:
-        raise EnvironmentError(
-            f"Загрузка токена бота в виртуальное окружение не удалась, используя путь: {filepath}"
-        )
-
-    return correct_bot_token
 
 
 # ____________________________________________________________________________
