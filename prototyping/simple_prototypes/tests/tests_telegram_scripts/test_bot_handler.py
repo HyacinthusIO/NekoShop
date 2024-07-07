@@ -9,25 +9,19 @@ Copyright 2024 HyacinthusIO
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import unittest
 import aiogram
 import asyncio
-import os
 
 import aiogram.exceptions
 
 from prototypes.telegram_scripts.bot_handler import *
-from .auxiliary_modules.get_bot_token import get_bot_token
+from .other.auxiliary_code.base_bot_test_case_class import BaseBotTestCase
 
 from aiogram.client.default import DefaultBotProperties
 from aiogram.utils.token import TokenValidationError
-
-
-PATH_TO_TEST_DIR: str = os.path.dirname(__file__)
-TEST_DATA_DIR_NAME: str = "test_data"
-ENV_FILE_NAME_WITH_CORRECT_BOT_TOKEN: str = "correct_bot_token.env"
 
 
 # ____________________________________________________________________________
@@ -61,28 +55,19 @@ class TestCreateDispatcherNegative(unittest.IsolatedAsyncioTestCase):
 
 
 # ____________________________________________________________________________
-class TestConfigureBotPositive(unittest.IsolatedAsyncioTestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        unittest.IsolatedAsyncioTestCase.setUpClass()
-
-        cls.path_to_bot_token_env_file: str = os.path.join(
-            PATH_TO_TEST_DIR, TEST_DATA_DIR_NAME, ENV_FILE_NAME_WITH_CORRECT_BOT_TOKEN
-        )
-
-        cls.__correct_bot_token: str = get_bot_token(
-            filepath=cls.path_to_bot_token_env_file, token_key="TOKEN"
-        )
+class TestConfigureBotPositive(BaseBotTestCase):
+    async def asyncSetUp(self) -> None:
+        pass
 
     # ------------------------------------------------------------------------
     async def test_successful_bot_setup(self) -> None:
-        bot: aiogram.Bot = await configure_bot(bot_token=self.__correct_bot_token)
+        bot: aiogram.Bot = await configure_bot(bot_token=self._correct_bot_token)
 
         self.assertIsInstance(obj=bot, cls=aiogram.Bot)
 
     # ------------------------------------------------------------------------
     async def test_default_parse_mode_is_html(self) -> None:
-        bot: aiogram.Bot = await configure_bot(bot_token=self.__correct_bot_token)
+        bot: aiogram.Bot = await configure_bot(bot_token=self._correct_bot_token)
 
         self.assertEqual(
             first=aiogram.enums.ParseMode.HTML, second=bot.default.parse_mode
@@ -91,7 +76,7 @@ class TestConfigureBotPositive(unittest.IsolatedAsyncioTestCase):
     # ------------------------------------------------------------------------
     async def test_function_get_DefaultBotProperties(self) -> None:
         bot: aiogram.Bot = await configure_bot(
-            bot_token=self.__correct_bot_token,
+            bot_token=self._correct_bot_token,
             default_param=DefaultBotProperties(
                 disable_notification=True, allow_sending_without_reply=True
             ),
@@ -121,26 +106,13 @@ class TestConfigureBotNegative(unittest.IsolatedAsyncioTestCase):
 
 
 # ____________________________________________________________________________
-class TestRunBotPositive(unittest.IsolatedAsyncioTestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        unittest.IsolatedAsyncioTestCase.setUpClass()
-
-        cls.path_to_bot_token_env_file: str = os.path.join(
-            PATH_TO_TEST_DIR, TEST_DATA_DIR_NAME, ENV_FILE_NAME_WITH_CORRECT_BOT_TOKEN
-        )
-
-        cls.__correct_bot_token: str = get_bot_token(
-            filepath=cls.path_to_bot_token_env_file, token_key="TOKEN"
-        )
-
-    # -------------------------------------------------------------------------
+class TestRunBotPositive(BaseBotTestCase):
     async def asyncSetUp(self) -> None:
         await unittest.IsolatedAsyncioTestCase.asyncSetUp(self)
 
         self.event_loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
 
-        self.bot: aiogram.Bot = await configure_bot(bot_token=self.__correct_bot_token)
+        self.bot: aiogram.Bot = await configure_bot(bot_token=self._correct_bot_token)
         self.dispatcher: aiogram.Dispatcher = await create_dispatcher()
 
     # -------------------------------------------------------------------------
