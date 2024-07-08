@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+__all__: list[str] = ["get_bot_token"]
+
 import prototypes.external_scripts.env_handler as env_handler
 
 
