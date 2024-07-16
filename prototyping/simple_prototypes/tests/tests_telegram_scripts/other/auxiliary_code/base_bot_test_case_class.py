@@ -3,11 +3,9 @@
 __all__: list[str] = ["BaseBotTestCase"]
 
 import unittest
-import os
 import asyncio
 import aiogram
 
-from .get_bot_token import get_bot_token
 from ..config import TestCaseConfig as Config
 
 
@@ -23,15 +21,7 @@ class BaseBotTestCase(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls) -> None:
         unittest.IsolatedAsyncioTestCase.setUpClass()
 
-        cls.path_to_bot_token_env_file: str = os.path.join(
-            Config.PATH_TO_TEST_DATA_DIR,
-            Config.TEST_DATA_DIR_NAME,
-            Config.ENV_FILE_NAME_WITH_CORRECT_BOT_TOKEN,
-        )
-
-        cls._correct_bot_token: str = get_bot_token(
-            filepath=cls.path_to_bot_token_env_file, token_key="TOKEN"
-        )
+        cls._correct_bot_token: str = Config.API_TOKEN_BOT_1
 
     # -------------------------------------------------------------------------
     async def asyncSetUp(self) -> None:
