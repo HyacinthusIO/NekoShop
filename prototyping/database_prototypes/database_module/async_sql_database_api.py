@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
 
 """
-Модуль `interface_sql_database_api` предоставляет общий интерфейс,
-который определяет методы для реализации API для конкретных типов БД.
+Модуль `async_sql_database_api` предоставляет общий интерфейс,
+который определяет методы для реализации API для конкретных типов БД,
+используя одиночное соединение.
 
 Copyright 2024 HyacinthusIO
 Лицензия Apache, версия 2.0 (Apache-2.0 license)
 """
 
-__all__: list[str] = ["InterfaceSQLDataBaseAPI"]
+__all__: list[str] = ["AsyncSQLDataBaseAPI"]
 
 __author__ = "HyacinthusIO"
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 from abc import ABC, abstractmethod
+
 from typing import Any
 
 
 # _____________________________________________________________________________
-class InterfaceSQLDataBaseAPI[ConnectionType](ABC):
-    """Interface_DataBaseAPI интерфейс для реализации API для работы над БД.
+class AsyncSQLDataBaseAPI[ConnectionType](ABC):
+    """AsyncSQLDataBaseAPI интерфейс для реализации API для работы над БД.
 
-    Этот класс предоставляет набор общих методов для реализации конкретных типов API,
-    предназначенных для операций над определёнными типами БД.
+    Этот класс предоставляет интерфейс содержащий,
+    набор общих асинхронных методов для реализации конкретных типов API,
+    предназначенных для выполнения операций над определёнными типами БД.
 
-    *Интерфейс предпологает работу над одним активным подключением к БД.
+    *Интерфейс предпологает работу над одним соединением обеспечивающим подключение к БД.
 
     Args:
         ABC: Базовый класс для создания абстрактных классов,
@@ -37,9 +40,8 @@ class InterfaceSQLDataBaseAPI[ConnectionType](ABC):
     ) -> None:
         """set_connection_with_database устанавливает соединение к БД для API.
 
-        Этот метод должен устанавливать полученное соединение к БД
-        в соответствующий атрибут API, который отвечает за хранение
-        активного соединения.
+        Этот метод должен устанавливать полученное соединение к БД,
+        в соответствующий атрибут API, который отвечает за хранение соединения.
 
         Args:
             connection (ConnectionType): Объект соединения к БД.
@@ -49,13 +51,13 @@ class InterfaceSQLDataBaseAPI[ConnectionType](ABC):
     # -------------------------------------------------------------------------
     @abstractmethod
     async def get_connection_with_database(self) -> ConnectionType:
-        """get_connection_with_database возвращает объект подключения к БД.
+        """get_connection_with_database возвращает подключение к БД.
 
-        Этот метод должен возвращать объект подключения,
-        который позволит API взаимодействовать над БД.
+        Этот метод должен возвращать объект соединения,
+        который позволит API выполнять манипуляции над БД.
 
         Returns:
-            ConnectionType: Объект подключения к БД.
+            ConnectionType: Объект соединения к БД.
         """
         pass
 
@@ -76,7 +78,7 @@ class InterfaceSQLDataBaseAPI[ConnectionType](ABC):
     @abstractmethod
     async def execute_sql_query_to_database(
         self, query_string: str, query_data: Any = None
-    ) -> bool:
+    ) -> None:
         """execute_query_to_database выполняет запрос к БД.
 
         Этот метод должен выполнять запрос к подключённой БД.
@@ -86,8 +88,5 @@ class InterfaceSQLDataBaseAPI[ConnectionType](ABC):
             query_string (str): Строка запроса.
             query_data (Any, optional): Данные для подстановки в запрос.
                                         По умолчанию None.
-
-        Returns:
-            bool: True, если запрос выполнен успешно; иначе False.
         """
         pass
