@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Модуль manual_test_bot_start_command_handler представляет из себя ручной тест,
-для тестирования компонентов модуля bot_start_command_handler.
+Модуль manual_test_bot_inline_keyboard_handler представляет из себя ручной тест,
+для тестирования компонентов модуля bot_inline_keyboard_handler.
 
 Copyright 2024 HyacinthusIO
 Лицензия Apache, версия 2.0 (Apache-2.0 license)
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.1"
+__version__ = "1.0.0"
 
 
 # Настройка перед началом ручного тестирования
@@ -25,7 +25,12 @@ import asyncio
 from tests.tests_telegram_scripts.other.auxiliary_code.base_bot_test_case_class import (
     BaseBotTestCase,
 )
-from prototypes.telegram_scripts.bot_start_command_handler import router, test_status
+from tests.tests_telegram_scripts.other.config import TestCaseConfig
+from prototypes.telegram_scripts.bot_inline_keyboard_handler import (
+    router,
+    test_status,
+    keyboard_builder,
+)
 
 
 # ____________________________________________________________________________
@@ -44,7 +49,7 @@ class TestStartCommand(BaseBotTestCase):
     async def test_successfully_activated_handler(self) -> None:
         """
         Для успешного прохождения теста, требуется - после запуска бота,
-        лично написать в общем чате команду: `/start`, в следствии этого бот должен будет её обработать.
+        лично кликнуть/нажать на кнопку, прикреплённую к сообщению от бота.
         """
         test_task = self.event_loop.create_task(
             coro=self.dispatcher.start_polling(self.bot)  # type: ignore
@@ -52,7 +57,14 @@ class TestStartCommand(BaseBotTestCase):
 
         try:
             async with asyncio.timeout(delay=15):
-                await test_task
+                await asyncio.gather(
+                    test_task,
+                    self.bot.send_message(
+                        chat_id=TestCaseConfig.CHAT_ID,
+                        text="Тестирование Inline клавиатуры.",
+                        reply_markup=keyboard_builder.as_markup(),
+                    ),
+                )
 
         except asyncio.TimeoutError:
             pass
