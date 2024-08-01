@@ -11,7 +11,7 @@ Copyright 2024 HyacinthusIO
 __all__: list[str] = ["AsyncMySQLAPI"]
 
 __author__ = "HyacinthusIO"
-__version__ = "0.8.3"
+__version__ = "1.0.0"
 
 from ..database_module.async_sql_database_api import (
     AsyncSQLDataBaseAPI,
@@ -20,14 +20,20 @@ from ..database_module.async_sql_database_pool_api import (
     AsyncSQLDataBasePoolAPI,
 )
 
-from typing import Any
-from mysql.connector.pooling import PooledMySQLConnection, MySQLConnectionPool
-from .types import AsyncMySQLConnectionType
+from typing import Dict
+from string import Template
+from mysql.connector.pooling import MySQLConnectionPool
+from mysql.connector.errors import Error as MySQLError
+
+from .types import (
+    AsyncMySQLConnectionType,
+    MySQLPooledConnection,
+)
 
 
 class AsyncMySQLAPI(
     AsyncSQLDataBaseAPI[AsyncMySQLConnectionType],
-    AsyncSQLDataBasePoolAPI[MySQLConnectionPool, PooledMySQLConnection],
+    AsyncSQLDataBasePoolAPI[MySQLConnectionPool, MySQLPooledConnection],
 ):
     """AsyncMySQLAPI класс для представления API для БД СУБД-MySQL.
 
@@ -99,21 +105,25 @@ class AsyncMySQLAPI(
         Этот метод возвращает объект независимого подключения,
         установленным в соответствующем атрибуте API.
 
+        *Независимое подключение является асинхронным.
+
         Returns:
             AsyncMySQLConnectionType: Объект подключения к БД.
         """
         return self.__connection_with_database
 
     # -------------------------------------------------------------------------
-    async def get_connection_from_pool(self) -> PooledMySQLConnection:
+    async def get_connection_from_pool(self) -> MySQLPooledConnection:
         """get_connection_from_pool возвращает объект подключения к БД из пула.
 
         Этот метод возвращает объект подключения из пула.
 
+        *Соединения в пуле, являются синхронными.
+
         Returns:
-            PooledMySQLConnection: Объект соединения к БД из пула.
+            MySQLPooledConnection: Объект соединения к БД из пула.
         """
-        connection: PooledMySQLConnection = self.__pool.get_connection()
+        connection: MySQLPooledConnection = self.__pool.get_connection()
 
         return connection
 
@@ -121,11 +131,11 @@ class AsyncMySQLAPI(
     async def check_connection_with_database(self) -> bool:
         """check_connection_with_database проверяет активность прямого подключения к БД.
 
-        Этот метод производить проверку,
+        Этот метод производит проверку,
         определяющую активно ли текущее независимое соединение к БД.
 
         Returns:
-            bool: True, если соединение активно; иначе False.
+            bool: True, если подключение активно; иначе False.
         """
         connection: AsyncMySQLConnectionType = (
             await self.get_connection_with_database()
@@ -137,7 +147,7 @@ class AsyncMySQLAPI(
 
     # -------------------------------------------------------------------------
     async def close_connection_from_pool(
-        self, connection: PooledMySQLConnection
+        self, connection: MySQLPooledConnection
     ) -> None:
         """close_connection_from_pool закрывает соединение из пула.
 
@@ -145,21 +155,69 @@ class AsyncMySQLAPI(
         возвращая соединение обратно в пул.
 
         Args:
-            connection (PooledMySQLConnection): Объект соединения из пула.
+            connection (MySQLPooledConnection): Объект соединения из пула.
         """
         connection.close()
 
     # -------------------------------------------------------------------------
-    async def execute_sql_query_to_pool_connection(
+    async def execute_sql_query_use_pool(
         self,
-        connection: PooledMySQLConnection,
-        query_string: str,
-        query_data: Any = None,
+        query_template: Template,
+        query_data: Dict[str, str],
     ) -> None:
-        pass
+        """execute_sql_query_use_pool выполняет запрос к БД.
+
+        Этот метод выполняет запрос к БД, используя соединение из пула.
+        Для генерации запроса используется шаблон запроса и данные для подстановки в него.
+
+        Args:
+            query_template (Template): Шаблон строки запроса.
+            query_data (Dict[str, str]): Данные для подстановки в шаблон.
+        """
+        connection: MySQLPooledConnection = (
+            await self.get_connection_from_pool()
+        )
+
+        query_string: str = query_template.substitute(**query_data)
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query_string)
+
+                connection.commit()
+
+        except MySQLError as error:
+            connection.rollback()
+            print(f"Возникла ошибка при выполнении запроса! {error}")
+
+        finally:
+            await self.close_connection_from_pool(connection=connection)
 
     # -------------------------------------------------------------------------
     async def execute_sql_query_to_database(
-        self, query_string: str, query_data: Any = None
+        self, query_template: Template, query_data: Dict[str, str]
     ) -> None:
-        pass
+        """execute_sql_query_to_database выполняет запрос к БД.
+
+        Этот метод выполняет запрос к БД, используя независимое соединение.
+        Для генерации запроса используется шаблон запроса и данные для подстановки в него.
+
+        Args:
+            query_template (Template): Шаблон строки запроса.
+            query_data (Dict[str, str]): Данные для подстановки в шаблон.
+        """
+        connection: AsyncMySQLConnectionType = (
+            await self.get_connection_with_database()
+        )
+
+        query_string: str = query_template.substitute(**query_data)
+
+        try:
+            async with await connection.cursor() as cursor:
+                await cursor.execute(query_string)
+
+                await connection.commit()
+
+        except MySQLError as error:
+            await connection.rollback()
+            print(f"Возникла ошибка при выполнении запроса! {error}")

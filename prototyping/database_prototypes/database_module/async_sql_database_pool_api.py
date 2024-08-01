@@ -12,19 +12,20 @@ Copyright 2024 HyacinthusIO
 __all__: list[str] = ["AsyncSQLDataBasePoolAPI"]
 
 __author__ = "HyacinthusIO"
-__version__ = "0.7.1"
+__version__ = "1.0.0"
 
 from abc import ABC, abstractmethod
 
-from typing import Any
+from typing import Dict
+from string import Template
 
 
 # _____________________________________________________________________________
 class AsyncSQLDataBasePoolAPI[PoolType, PooledConnectionType](ABC):
     """AsyncSQLDataBasePoolAPI интерфейс для реализации API для работы над БД.
 
-    Этот абстрактный класс предоставляет интерфейс содержащий,
-    набор общих методов требующих реализацию для конкретных API,
+    Этот абстрактный класс предоставляет интерфейс,
+    содержащий набор общих методов требующих реализацию для конкретных API,
     предназначенных для выполнения операций над определёнными типами БД,
     используя пул соединений.
 
@@ -52,8 +53,8 @@ class AsyncSQLDataBasePoolAPI[PoolType, PooledConnectionType](ABC):
     async def get_connection_from_pool(self) -> PooledConnectionType:
         """get_connection_from_pool возвращает подключения к БД из пула.
 
-        Этот метод должен возвращать подключение,
-        которое позволит API выполнять манипуляции над БД.
+        Этот метод должен возвращать соединение из пула,
+        закреплённого за API.
 
         Returns:
             PooledConnectionType: Объект соединения к БД из пула.
@@ -77,21 +78,18 @@ class AsyncSQLDataBasePoolAPI[PoolType, PooledConnectionType](ABC):
 
     # -------------------------------------------------------------------------
     @abstractmethod
-    async def execute_sql_query_to_pool_connection(
+    async def execute_sql_query_use_pool(
         self,
-        connection: PooledConnectionType,
-        query_string: str,
-        query_data: Any = None,
+        query_template: Template,
+        query_data: Dict[str, str],
     ) -> None:
-        """execute_query_to_pool_connection выполняет запрос к БД.
+        """execute_sql_query_use_pool выполняет запрос к БД.
 
         Этот метод должен выполнять запрос к БД, используя соединение из пула.
-        Так же получая запрос в виде строки и данные для подстановки в запрос.
+        Так же получая запрос в виде шаблона строки и данные для подстановки в запрос.
 
         Args:
-            connection (PooledConnectionType): Соединение из пула, для выполнения запроса.
-            query_string (str): Строка запроса.
-            query_data (Any, optional): Данные для подстановки в запрос.
-                                        По умолчанию None.
+            query_template (Template): Шаблон запроса.
+            query_data (Dict[str, str]): Данные для подстановки в запрос.
         """
         pass

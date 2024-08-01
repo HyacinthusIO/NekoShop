@@ -14,7 +14,7 @@ Copyright 2024 HyacinthusIO
 __all__: list[str] = ["AbstractAsyncDataBase"]
 
 __author__ = "HyacinthusIO"
-__version__ = "0.9.2"
+__version__ = "1.0.0"
 
 from abc import ABC, abstractmethod
 
@@ -60,8 +60,8 @@ class AbstractAsyncDataBase[APIType, ConnectMethodType, ConnectionType](ABC):
         """__init__ конструктор.
 
         Args:
-            connect_method (ConnectMethodType): Функция, используемая для подключения к БД.
-            connection_data (Dict[str, str]): Данные (ключевые аргументы), для аутентификации.
+            connect_method (ConnectMethodType): Функция, используемая для установки соединения к БД.
+            connection_data (Dict[str, str]): Данные для настройки подключения.
             api (APIType): Объект, реализующий API для определённого типа БД.
         """
         self._connect_method = connect_method
@@ -98,8 +98,7 @@ class AbstractAsyncDataBase[APIType, ConnectMethodType, ConnectionType](ABC):
     async def get_connection_with_database(self) -> ConnectionType:
         """get_connection_with_database возвращает объект подключения к БД.
 
-        Этот метод должен возвращать объект подключения,
-        который обеспечит взаимодействие класса над БД.
+        Этот метод должен возвращать объект подключения к БД.
 
         *Если подключение не было установленно до вызова данного метода,
         следует вызвать метод для создания подключения.

@@ -11,15 +11,15 @@ Copyright 2024 HyacinthusIO
 __all__: list[str] = ["AsyncMySQLDataBase"]
 
 __author__ = "HyacinthusIO"
-__version__ = "0.9.0"
+__version__ = "1.0.0"
 
 from ..database_module.abstract_async_database import AbstractAsyncDataBase
 
 from typing import Dict, Any
 from mysql.connector.pooling import MySQLConnectionPool
 
-from .types import AsyncMySQLConnectionType, AsyncMySQLConnectMethodType
 from .async_mysql_database_api import AsyncMySQLAPI
+from .types import AsyncMySQLConnectionType, AsyncMySQLConnectMethodType
 
 
 # _____________________________________________________________________________
@@ -116,6 +116,9 @@ class AsyncMySQLDataBase(
         Этот метод возвращает объект текущего,
         независимого от пула соединений, подключения к БД.
 
+        *Если соединение не было создано,
+        тогда вызвается соответствующий метод для создания подключения к БД.
+
         Returns:
             AsyncMySQLConnectionType: Объект подключения к БД.
         """
@@ -126,7 +129,7 @@ class AsyncMySQLDataBase(
 
     # -------------------------------------------------------------------------
     async def close_connection_with_database(self) -> None:
-        """close_connection_with_database закрывает текущее независимое соединение к БД.
+        """close_connection_with_database закрывает текущее независимое подключение к БД.
 
         Этот метод закрывает текущее независимое от пула соединений,
         соединение к БД, тем самым обрывая независимое подключение к БД.
