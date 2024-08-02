@@ -9,23 +9,17 @@ Copyright 2024 HyacinthusIO
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.1"
-
-
-# Настройка перед началом ручного тестирования
-# .............................................................................
-import sys
-
-sys.path.append("D:/GitRepository's/Active/NekoShop/prototyping/simple_prototypes")
-# .............................................................................
-
+__version__ = "1.0.2"
 
 import asyncio
 
 from tests.tests_telegram_scripts.other.auxiliary_code.base_bot_test_case_class import (
     BaseBotTestCase,
 )
-from prototypes.telegram_scripts.bot_start_command_handler import router, test_status
+from prototypes.telegram_scripts.bot_start_command_handler import (
+    router,
+    test_status,
+)
 
 
 # ____________________________________________________________________________
@@ -46,6 +40,9 @@ class TestStartCommand(BaseBotTestCase):
         Для успешного прохождения теста, требуется - после запуска бота,
         лично написать в общем чате команду: `/start`, в следствии этого бот должен будет её обработать.
         """
+
+        print(self.test_successfully_activated_handler.__doc__)
+
         test_task = self.event_loop.create_task(
             coro=self.dispatcher.start_polling(self.bot)  # type: ignore
         )

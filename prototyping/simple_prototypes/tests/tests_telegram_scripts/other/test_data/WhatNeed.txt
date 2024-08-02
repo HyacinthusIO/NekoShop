@@ -1,3 +1,2 @@
-bot_1_token.env - API токен основного Telegram бота.
-bot_2_token.env - API токен вспомогательного Telegram бота.
+bot_token.env - API токен основного Telegram бота.
 telegram_chat_id.env - ID Telegram чата, в котором среди участников присутствуют оба бота и в котором происходит тестирование.

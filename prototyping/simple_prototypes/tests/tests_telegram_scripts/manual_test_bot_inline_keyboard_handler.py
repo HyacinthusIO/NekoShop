@@ -9,16 +9,7 @@ Copyright 2024 HyacinthusIO
 """
 
 __author__ = "HyacinthusIO"
-__version__ = "1.0.0"
-
-
-# Настройка перед началом ручного тестирования
-# .............................................................................
-import sys
-
-sys.path.append("D:/GitRepository's/Active/NekoShop/prototyping/simple_prototypes")
-# .............................................................................
-
+__version__ = "1.0.1"
 
 import asyncio
 
@@ -51,6 +42,9 @@ class TestStartCommand(BaseBotTestCase):
         Для успешного прохождения теста, требуется - после запуска бота,
         лично кликнуть/нажать на кнопку, прикреплённую к сообщению от бота.
         """
+
+        print(self.test_successfully_activated_handler.__doc__)
+
         test_task = self.event_loop.create_task(
             coro=self.dispatcher.start_polling(self.bot)  # type: ignore
         )

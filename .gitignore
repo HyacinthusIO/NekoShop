@@ -1,8 +1,4 @@
-venv
 __pycache__
 .vscode
-bot_1_token.env
-bot_2_token.env
+bot_token.env
 telegram_chat_id.env
-test_main.py
-test_connection.session.sql
