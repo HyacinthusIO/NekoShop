@@ -1,6 +1,8 @@
 # NekoShop
 ---
+![SocialPreview](/NekoShop_preview.jpg)<br>
 Telegram бот, представляющий из себя онлайн-магазин в мессенджере Telegram.
+
 
 ## Краткие сведения о технической состовляющей:
 **Операционная система**: Windows 10<br>
