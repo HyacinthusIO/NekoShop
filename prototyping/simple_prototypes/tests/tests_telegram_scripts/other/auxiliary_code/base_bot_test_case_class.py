@@ -21,7 +21,7 @@ class BaseBotTestCase(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls) -> None:
         unittest.IsolatedAsyncioTestCase.setUpClass()
 
-        cls._correct_bot_token: str = Config.API_TOKEN_BOT_1
+        cls._correct_bot_token: str = Config.API_TOKEN_BOT
 
     # -------------------------------------------------------------------------
     async def asyncSetUp(self) -> None:
